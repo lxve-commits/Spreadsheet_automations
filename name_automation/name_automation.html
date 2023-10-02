@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSV Manipulator</title>
+</head>
+<body>
+    <input type="file" id="csvFile" accept=".csv" />
+    <button onclick="downloadModifiedCSV()">Download Modified CSV</button>
+    <script>
+        let modifiedData = "";
+
+        document.getElementById('csvFile').addEventListener('change', function(evt) {
+            let file = evt.target.files[0];
+            let reader = new FileReader();
+            reader.readAsText(file);
+            reader.onload = function(event) {
+                let csvData = event.target.result;
+                let lines = csvData.split("\n");
+
+                // Skip the header line
+                for(let i = 1; i < lines.length; i++) {
+                    let currentLine = lines[i].split(',');
+                    let name = currentLine[0];
+                    let age18to25 = parseInt(currentLine[1]);
+                    let age26to35 = parseInt(currentLine[2]);
+
+                    for(let j = 0; j < age18to25; j++) {
+                        modifiedData += name + ',' + '18-25' + '\n';
+                    }
+                    for(let j = 0; j < age26to35; j++) {
+                        modifiedData += name + ',' + '26-35' + '\n';
+                    }
+                }
+            };
+        });
+
+        function downloadModifiedCSV() {
+            let blob = new Blob([modifiedData], { type: 'text/csv;charset=utf-8;' });
+            let link = document.createElement("a");
+            let url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "modified.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
